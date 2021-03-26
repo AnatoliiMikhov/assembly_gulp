@@ -7,7 +7,8 @@ const { src, dest } = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	groupMedia = require('gulp-group-css-media-queries'),
 	cleanCSS = require('gulp-clean-css'),
-	rename = require('gulp-rename');
+	rename = require('gulp-rename'),
+	webpack = require('webpack-stream');
 
 // ============================================================================
 const distFolder = 'dist',
@@ -72,10 +73,50 @@ function styles() {
 		.pipe(browserSync.stream());
 }
 
+function scriptJS() {
+	return src(path.src.js)
+		.pipe(
+			webpack({
+				mode: 'development',
+				output: {
+					filename: 'script.js',
+				},
+				watch: false,
+				devtool: 'source-map',
+				module: {
+					rules: [
+						{
+							test: /\.m?js$/,
+							exclude: /(node_modules|bower_components)/,
+							use: {
+								loader: 'babel-loader',
+								options: {
+									presets: [
+										[
+											'@babel/preset-env',
+											{
+												debug: true,
+												corejs: 3,
+												useBuiltIns: 'usage',
+											},
+										],
+									],
+								},
+							},
+						},
+					],
+				},
+			})
+		)
+		.pipe(gulp.dest(path.build.js))
+		.on('end', browserSync.reload);
+}
+
 // wath files changes
 function watchFiles() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.css], styles);
+	gulp.watch([path.watch.js], scriptJS);
 }
 
 // clean dist catalog
@@ -84,10 +125,11 @@ function cleanDist() {
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, gulp.parallel(styles, html));
+const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html));
 const watch = gulp.parallel(build, watchFiles, server);
 
 // =============================================================================
+exports.scriptJS = scriptJS;
 exports.styles = styles;
 exports.html = html;
 exports.build = build;
