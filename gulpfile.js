@@ -115,7 +115,7 @@ function scriptJS() {
 }
 
 // images =====================================================================
-function images() {
+/* function images() {
 	return src(path.src.img)
 		.pipe(
 			imagemin({
@@ -127,6 +127,23 @@ function images() {
 		)
 		.pipe(dest(path.build.img))
 		.pipe(browserSync.stream());
+} */
+
+function images() {
+	return src(path.src.img)
+		.pipe(
+			imagemin([
+				imagemin.gifsicle({ interlaced: true }),
+				imagemin.mozjpeg({ quality: 75, progressive: true }),
+				imagemin.optipng({ optimizationLevel: 3 }),
+				imagemin.svgo({
+					plugins: [{ removeViewBox: false }],
+				}),
+			])
+		)
+		.pipe(dest(path.build.img))
+		.pipe(browserSync.stream())
+		.on('end', browserSync.reload);
 }
 
 // ============================================================================
@@ -143,7 +160,7 @@ function cleanDist() {
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html, images));
+const build = gulp.series(cleanDist, images, gulp.parallel(scriptJS, styles, html));
 const watch = gulp.parallel(build, watchFiles, server);
 
 // =============================================================================
