@@ -1,0 +1,28 @@
+// @import 'libs/bootstrap-reboot.min';
+
+@import 'base/variables';
+@import 'base/mixins';
+
+body {
+	font-size: 16px;
+	display: flex;
+	padding-left: 50px;
+	margin-right: 20px;
+}
+
+@import './blocks/header';
+
+span {
+	font-size: 20px;
+	@media (max-width: 767px) {
+		font-size: 15px;
+	}
+}
+
+div {
+	color: $main-color;
+	font-size: 30px;
+	@media (max-width: 767px) {
+		font-size: 20px;
+	}
+}
