@@ -10,7 +10,7 @@ const { src, dest } = require('gulp'),
 	rename = require('gulp-rename'),
 	webpack = require('webpack-stream');
 
-// ============================================================================
+// ===========================================================================
 const distFolder = 'dist',
 	sourceFolder = 'src',
 	path = {
@@ -37,7 +37,7 @@ const distFolder = 'dist',
 		clean: './' + distFolder + '/',
 	};
 
-// ==============================================================================
+// ===========================================================================
 function server() {
 	browserSync.init({
 		server: {
@@ -48,7 +48,7 @@ function server() {
 	});
 }
 
-// html files work
+// html files work ===========================================================
 function html() {
 	return src(path.src.html)
 		.pipe(fileinclude())
@@ -56,7 +56,7 @@ function html() {
 		.pipe(browserSync.stream());
 }
 
-// sass scss func
+// sass scss func ============================================================
 function styles() {
 	return src(path.src.css)
 		.pipe(
@@ -73,6 +73,7 @@ function styles() {
 		.pipe(browserSync.stream());
 }
 
+// scripts ===================================================================
 function scriptJS() {
 	return src(path.src.js)
 		.pipe(
@@ -112,14 +113,14 @@ function scriptJS() {
 		.on('end', browserSync.reload);
 }
 
-// wath files changes
+// ============================================================================
 function watchFiles() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.css], styles);
 	gulp.watch([path.watch.js], scriptJS);
 }
 
-// clean dist catalog
+// clean dist catalog ========================================================
 function cleanDist() {
 	return del(path.clean);
 }
