@@ -8,7 +8,8 @@ const { src, dest } = require('gulp'),
 	groupMedia = require('gulp-group-css-media-queries'),
 	cleanCSS = require('gulp-clean-css'),
 	rename = require('gulp-rename'),
-	webpack = require('webpack-stream');
+	webpack = require('webpack-stream'),
+	imagemin = require('gulp-imagemin');
 
 // ===========================================================================
 const distFolder = 'dist',
@@ -113,11 +114,27 @@ function scriptJS() {
 		.on('end', browserSync.reload);
 }
 
+// images =====================================================================
+function images() {
+	return src(path.src.img)
+		.pipe(
+			imagemin({
+				progressive: true,
+				svgoPlugins: [{ removeViewBox: false }],
+				interlaced: true,
+				optimizationLevel: 3,
+			})
+		)
+		.pipe(dest(path.build.img))
+		.pipe(browserSync.stream());
+}
+
 // ============================================================================
 function watchFiles() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.css], styles);
 	gulp.watch([path.watch.js], scriptJS);
+	gulp.watch([path.watch.img], images);
 }
 
 // clean dist catalog ========================================================
@@ -126,10 +143,11 @@ function cleanDist() {
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html));
+const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html, images));
 const watch = gulp.parallel(build, watchFiles, server);
 
 // =============================================================================
+exports.images = images;
 exports.scriptJS = scriptJS;
 exports.styles = styles;
 exports.html = html;
