@@ -78,9 +78,9 @@ function scriptJS() {
 	return src(path.src.js)
 		.pipe(
 			webpack({
-				mode: 'development',
+				mode: 'production',
 				output: {
-					filename: 'script.js',
+					filename: 'script.min.js',
 				},
 				watch: false,
 				devtool: 'source-map',
