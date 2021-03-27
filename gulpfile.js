@@ -26,14 +26,14 @@ const distFolder = 'dist',
 			html: [sourceFolder + '/*.html', '!' + sourceFolder + '/_*.html'],
 			css: sourceFolder + '/sass/style.scss',
 			js: sourceFolder + '/js/script.js',
-			img: sourceFolder + '/img/**/*.{jpg,png,svg,gif,ico,webp}',
+			img: sourceFolder + '/img/**/*.{jpg,jpeg,png,svg,gif,ico,webp}',
 			fonts: sourceFolder + '/fonts/*.ttf',
 		},
 		watch: {
 			html: sourceFolder + '/**/*.html',
 			css: sourceFolder + '/sass/**/*.+(scss|sass)',
 			js: sourceFolder + '/js/**/*.js',
-			img: sourceFolder + '/img/**/*.{jpg,png,svg,gif,ico,webp}',
+			img: sourceFolder + '/img/**/*.{jpg,jpeg,png,svg,gif,ico,webp}',
 		},
 		clean: './' + distFolder + '/',
 	};
@@ -115,20 +115,6 @@ function scriptJS() {
 }
 
 // images =====================================================================
-/* function images() {
-	return src(path.src.img)
-		.pipe(
-			imagemin({
-				progressive: true,
-				svgoPlugins: [{ removeViewBox: false }],
-				interlaced: true,
-				optimizationLevel: 3,
-			})
-		)
-		.pipe(dest(path.build.img))
-		.pipe(browserSync.stream());
-} */
-
 function images() {
 	return src(path.src.img)
 		.pipe(
@@ -155,15 +141,16 @@ function watchFiles() {
 }
 
 // clean dist catalog ========================================================
-function cleanDist() {
-	return del(path.clean);
+async function cleanDist() {
+	return await del(path.clean);
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, images, gulp.parallel(scriptJS, styles, html));
+const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html, images));
 const watch = gulp.parallel(build, watchFiles, server);
 
 // =============================================================================
+exports.watchFiles = watchFiles;
 exports.images = images;
 exports.scriptJS = scriptJS;
 exports.styles = styles;
