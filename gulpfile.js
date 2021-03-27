@@ -132,8 +132,7 @@ function images() {
 			)
 		)
 		.pipe(dest(path.build.img))
-		.pipe(browserSync.stream())
-		.on('end', browserSync.reload);
+		.pipe(browserSync.stream());
 }
 
 // ============================================================================
@@ -141,7 +140,14 @@ function watchFiles() {
 	watch([path.watch.html], html);
 	watch([path.watch.css], styles);
 	watch([path.watch.js], scriptJS);
-	watch([path.watch.img], images);
+	watch(
+		[path.watch.img],
+		{
+			usePolling: false,
+			ignoreInitial: true
+		},
+		images
+	);
 }
 
 // clean dist catalog ========================================================
@@ -150,7 +156,7 @@ async function cleanDist() {
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html, images));
+const build = gulp.series(cleanDist, images, gulp.parallel(scriptJS, styles, html));
 const watchTask = gulp.series(build, parallel(watchFiles, server));
 
 // =============================================================================
