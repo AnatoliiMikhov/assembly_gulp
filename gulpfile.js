@@ -1,4 +1,4 @@
-const { src, dest } = require('gulp'),
+const { src, dest, parallel } = require('gulp'),
 	gulp = require('gulp'),
 	browserSync = require('browser-sync').create(),
 	fileinclude = require('gulp-file-include'),
@@ -9,7 +9,8 @@ const { src, dest } = require('gulp'),
 	cleanCSS = require('gulp-clean-css'),
 	rename = require('gulp-rename'),
 	webpack = require('webpack-stream'),
-	imagemin = require('gulp-imagemin');
+	imagemin = require('gulp-imagemin'),
+	watch = require('gulp-watch');
 
 // ===========================================================================
 const distFolder = 'dist',
@@ -118,14 +119,17 @@ function scriptJS() {
 function images() {
 	return src(path.src.img)
 		.pipe(
-			imagemin([
-				imagemin.gifsicle({ interlaced: true }),
-				imagemin.mozjpeg({ quality: 75, progressive: true }),
-				imagemin.optipng({ optimizationLevel: 3 }),
-				imagemin.svgo({
-					plugins: [{ removeViewBox: false }],
-				}),
-			])
+			imagemin(
+				[
+					imagemin.gifsicle({ interlaced: true }),
+					imagemin.mozjpeg({ quality: 75, progressive: true }),
+					imagemin.optipng({ optimizationLevel: 3 }),
+					imagemin.svgo({
+						plugins: [{ removeViewBox: false }],
+					}),
+				],
+				{ verbose: true }
+			)
 		)
 		.pipe(dest(path.build.img))
 		.pipe(browserSync.stream())
@@ -134,10 +138,10 @@ function images() {
 
 // ============================================================================
 function watchFiles() {
-	gulp.watch([path.watch.html], html);
-	gulp.watch([path.watch.css], styles);
-	gulp.watch([path.watch.js], scriptJS);
-	gulp.watch([path.watch.img], images);
+	watch([path.watch.html], html);
+	watch([path.watch.css], styles);
+	watch([path.watch.js], scriptJS);
+	watch([path.watch.img], images);
 }
 
 // clean dist catalog ========================================================
@@ -147,7 +151,7 @@ async function cleanDist() {
 
 // =============================================================================
 const build = gulp.series(cleanDist, gulp.parallel(scriptJS, styles, html, images));
-const watch = gulp.parallel(build, watchFiles, server);
+const watchTask = gulp.series(build, parallel(watchFiles, server));
 
 // =============================================================================
 exports.watchFiles = watchFiles;
@@ -156,5 +160,6 @@ exports.scriptJS = scriptJS;
 exports.styles = styles;
 exports.html = html;
 exports.build = build;
-exports.watch = watch;
-exports.default = watch;
+exports.watchTask = watchTask;
+exports.cleanDist = cleanDist;
+exports.default = watchTask;

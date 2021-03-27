@@ -1,6 +1,3 @@
-const modals = () => {
-	console.log('test gulp assembly');
-	console.log('second test text');
-};
+const modals = () => {};
 
 export default modals;

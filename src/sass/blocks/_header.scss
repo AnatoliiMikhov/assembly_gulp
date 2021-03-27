@@ -1,17 +1,8 @@
 .header {
 	padding-top: 50px;
-	img {
-		max-width: 100%;
-		object-fit: cover;
-	}
-	h1 {
-		color: $main-color;
-	}
-
-	.sphera-img {
-		width: 500px;
-		height: 500px;
-		margin: 0 auto;
+	padding-bottom: 20px;
+	&__logo {
+		width: 250px;
 		img {
 			max-width: 100%;
 			object-fit: cover;
