@@ -34,6 +34,8 @@
     "gulp-watch": "^5.0.1",
     "gulp-webp": "^4.0.1",
     "gulp-webp-in-html": "^1.0.1",
+    "gulp-webpcss": "^1.1.1",
+    "webp-converter": "^2.2.3",
     "webpack": "^5.28.0",
     "webpack-stream": "^6.1.2"
   }

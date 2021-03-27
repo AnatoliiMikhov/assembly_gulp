@@ -12,7 +12,9 @@ const { src, dest, parallel } = require('gulp'),
 	imagemin = require('gulp-imagemin'),
 	watch = require('gulp-watch'),
 	webp = require('gulp-webp'),
-	webp2html = require('gulp-webp-in-html');
+	webp2html = require('gulp-webp-in-html'),
+	webpcss = require('gulp-webpcss');
+
 
 // ===========================================================================
 const distFolder = 'dist',
@@ -71,6 +73,7 @@ function styles() {
 		)
 		.pipe(groupMedia())
 		.pipe(autoprefixer())
+		.pipe(webpcss())
 		.pipe(dest(path.build.css))
 		.pipe(cleanCSS({ compatibility: 'ie8' }))
 		.pipe(rename({ suffix: '.min', prefix: '' }))
