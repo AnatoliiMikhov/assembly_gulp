@@ -10,7 +10,9 @@ const { src, dest, parallel } = require('gulp'),
 	rename = require('gulp-rename'),
 	webpack = require('webpack-stream'),
 	imagemin = require('gulp-imagemin'),
-	watch = require('gulp-watch');
+	watch = require('gulp-watch'),
+	webp = require('gulp-webp'),
+	webp2html = require('gulp-webp-in-html');
 
 // ===========================================================================
 const distFolder = 'dist',
@@ -54,6 +56,7 @@ function server() {
 function html() {
 	return src(path.src.html)
 		.pipe(fileinclude())
+		.pipe(webp2html())
 		.pipe(dest(path.build.html))
 		.pipe(browserSync.stream());
 }
@@ -118,6 +121,9 @@ function scriptJS() {
 // images =====================================================================
 function images() {
 	return src(path.src.img)
+		.pipe(webp({ quality: 70 }))
+		.pipe(dest(path.build.img))
+		.pipe(src(path.src.img))
 		.pipe(
 			imagemin(
 				[
@@ -144,7 +150,7 @@ function watchFiles() {
 		[path.watch.img],
 		{
 			usePolling: false,
-			ignoreInitial: true
+			ignoreInitial: true,
 		},
 		images
 	);
