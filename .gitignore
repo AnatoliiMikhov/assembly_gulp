@@ -9,6 +9,7 @@
 # production
 /build
 /dist
+/assembly_gulp
 
 # misc
 .DS_Store
