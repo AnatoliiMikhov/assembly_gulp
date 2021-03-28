@@ -20,7 +20,8 @@ const { src, dest, parallel } = require('gulp'),
 
 // ===========================================================================
 // const dist = '/var/www/dev/assembly_gulp/';
-const dist = 'dist';
+// const dist = 'dist';
+const dist = require('path').basename(__dirname);
 
 const distFolder = dist,
 	sourceFolder = 'src',
