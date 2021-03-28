@@ -4,3 +4,8 @@
 @include font("Roboto", "Roboto-Medium", "500", "normal");
 @include font("Roboto", "Roboto-Regular", "400", "normal");
 @include font("Roboto", "Roboto-Thin", "100", "normal");
+
+// перед запуском Gulp при добавлении шрифтов очистить файл.
+// изменить font-family 1 position
+// change font-weight fonts 100, 300, 400, 500, 700, 900
+// Thin = 100, Light = 300, regular = 400, Medium = 500, Bold = 700, Black = 900
