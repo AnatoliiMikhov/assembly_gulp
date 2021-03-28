@@ -13,11 +13,15 @@ const { src, dest, parallel } = require('gulp'),
 	watch = require('gulp-watch'),
 	webp = require('gulp-webp'),
 	webp2html = require('gulp-webp-in-html'),
-	webpcss = require('gulp-webpcss');
-
+	webpcss = require('gulp-webpcss'),
+	ttf2woff = require('gulp-ttf2woff'),
+	ttf2woff2 = require('gulp-ttf2woff2');
 
 // ===========================================================================
-const distFolder = 'dist',
+// const dist = '/var/www/dev/assembly_gulp/';
+const dist = 'dist';
+
+const distFolder = dist,
 	sourceFolder = 'src',
 	path = {
 		build: {
@@ -144,6 +148,12 @@ function images() {
 		.pipe(browserSync.stream());
 }
 
+// fonts ======================================================================
+function fonts() {
+	src(path.src.fonts).pipe(ttf2woff()).pipe(dest(path.build.fonts));
+	return src(path.src.fonts).pipe(ttf2woff2()).pipe(dest(path.build.fonts));
+}
+
 // ============================================================================
 function watchFiles() {
 	watch([path.watch.html], html);
@@ -165,10 +175,11 @@ async function cleanDist() {
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, images, gulp.parallel(scriptJS, styles, html));
+const build = gulp.series(cleanDist, fonts, images, gulp.parallel(scriptJS, styles, html));
 const watchTask = gulp.series(build, parallel(watchFiles, server));
 
 // =============================================================================
+exports.fonts = fonts;
 exports.watchFiles = watchFiles;
 exports.images = images;
 exports.scriptJS = scriptJS;
