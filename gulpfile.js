@@ -15,7 +15,8 @@ const { src, dest, parallel } = require('gulp'),
 	webp2html = require('gulp-webp-in-html'),
 	webpcss = require('gulp-webpcss'),
 	ttf2woff = require('gulp-ttf2woff'),
-	ttf2woff2 = require('gulp-ttf2woff2');
+	ttf2woff2 = require('gulp-ttf2woff2'),
+	fs = require('fs');
 
 // ===========================================================================
 // const dist = '/var/www/dev/assembly_gulp/';
@@ -59,6 +60,7 @@ function server() {
 }
 
 // html files work ===========================================================
+
 function html() {
 	return src(path.src.html)
 		.pipe(fileinclude())
@@ -68,6 +70,7 @@ function html() {
 }
 
 // sass scss func ============================================================
+
 function styles() {
 	return src(path.src.css)
 		.pipe(
@@ -86,6 +89,7 @@ function styles() {
 }
 
 // scripts ===================================================================
+
 function scriptJS() {
 	return src(path.src.js)
 		.pipe(
@@ -126,11 +130,16 @@ function scriptJS() {
 }
 
 // images =====================================================================
-function images() {
+
+function img2webp() {
 	return src(path.src.img)
 		.pipe(webp({ quality: 70 }))
 		.pipe(dest(path.build.img))
-		.pipe(src(path.src.img))
+		.pipe(browserSync.stream());
+}
+
+function images() {
+	return src(path.src.img)
 		.pipe(
 			imagemin(
 				[
@@ -149,12 +158,39 @@ function images() {
 }
 
 // fonts ======================================================================
+
 function fonts() {
 	src(path.src.fonts).pipe(ttf2woff()).pipe(dest(path.build.fonts));
 	return src(path.src.fonts).pipe(ttf2woff2()).pipe(dest(path.build.fonts));
 }
 
-// ============================================================================
+async function fontsStyle() {
+	let fileContent = fs.readFileSync(sourceFolder + '/sass/fonts/fonts.scss');
+	if (fileContent == '') {
+		fs.writeFile(sourceFolder + '/sass/fonts/fonts.scss', '', cb);
+		return await fs.readdir(path.build.fonts, function (err, items) {
+			if (items) {
+				let cFontname;
+				for (let i = 0; i < items.length; i++) {
+					let fontname = items[i].split('.');
+					fontname = fontname[0];
+					if (cFontname != fontname) {
+						fs.appendFile(
+							sourceFolder + '/sass/fonts/fonts.scss',
+							'@include font("' + fontname + '", "' + fontname + '", "400", "normal");\r\n',
+							cb
+						);
+					}
+					cFontname = fontname;
+				}
+			}
+		});
+	}
+}
+function cb() {}
+
+// watch files ================================================================
+
 function watchFiles() {
 	watch([path.watch.html], html);
 	watch([path.watch.css], styles);
@@ -167,25 +203,38 @@ function watchFiles() {
 		},
 		images
 	);
+	watch(
+		[path.watch.img],
+		{
+			usePolling: false,
+			ignoreInitial: true,
+		},
+		img2webp
+	);
 }
 
 // clean dist catalog ========================================================
+
 async function cleanDist() {
 	return await del(path.clean);
 }
 
 // =============================================================================
-const build = gulp.series(cleanDist, fonts, images, gulp.parallel(scriptJS, styles, html));
+
+const build = gulp.series(
+	cleanDist,
+	fonts,
+	gulp.parallel(images, img2webp),
+	gulp.parallel(scriptJS, styles, html),
+	fontsStyle
+);
+
 const watchTask = gulp.series(build, parallel(watchFiles, server));
 
 // =============================================================================
+exports.cleanDist = cleanDist;
 exports.fonts = fonts;
-exports.watchFiles = watchFiles;
-exports.images = images;
-exports.scriptJS = scriptJS;
-exports.styles = styles;
-exports.html = html;
+exports.fontsStyle = fontsStyle;
 exports.build = build;
 exports.watchTask = watchTask;
-exports.cleanDist = cleanDist;
 exports.default = watchTask;

@@ -1,12 +1,14 @@
-// @import 'libs/bootstrap-reboot.min';
+@import 'libs/bootstrap-reboot.min';
 
 @import 'base/variables';
 @import 'base/mixins';
 
+@import './fonts/fonts.scss';
+
+
 body {
 	font-family: Roboto, sans-serif;
 	font-size: 16px;
-	// display: flex;
 	padding-left: 50px;
 	margin-right: 20px;
 }
@@ -25,5 +27,12 @@ div {
 	font-size: 30px;
 	@media (max-width: 767px) {
 		font-size: 20px;
+	}
+}
+
+p{
+	font-weight: 400;
+	@media(max-width: 767px){
+		font-weight: 300;
 	}
 }
