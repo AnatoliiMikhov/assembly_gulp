@@ -1,5 +1,4 @@
-const { src, dest, parallel } = require('gulp'),
-	gulp = require('gulp'),
+const { src, dest, series, parallel } = require('gulp'),
 	browserSync = require('browser-sync').create(),
 	fileinclude = require('gulp-file-include'),
 	del = require('del'),
@@ -134,7 +133,7 @@ function scriptJS() {
 				},
 			})
 		)
-		.pipe(gulp.dest(path.build.js))
+		.pipe(dest(path.build.js))
 		.on('end', browserSync.reload);
 }
 
@@ -168,9 +167,9 @@ function images() {
 
 // fonts ======================================================================
 
-function fonts() {
-	src(path.src.fonts).pipe(ttf2woff()).pipe(dest(path.build.fonts));
-	return src(path.src.fonts).pipe(ttf2woff2()).pipe(dest(path.build.fonts));
+async function fonts() {
+	await src(path.src.fonts).pipe(ttf2woff()).pipe(dest(path.build.fonts));
+	return await src(path.src.fonts).pipe(ttf2woff2()).pipe(dest(path.build.fonts));
 }
 
 async function fontsStyle() {
@@ -230,15 +229,15 @@ async function cleanDist() {
 
 // =============================================================================
 
-const build = gulp.series(
+const build = series(
 	cleanDist,
 	fonts,
-	gulp.parallel(images, img2webp),
-	gulp.parallel(scriptJS, styles, html),
-	fontsStyle
+	fontsStyle,
+	parallel(images, img2webp),
+	parallel(scriptJS, styles, html)
 );
 
-const watchTask = gulp.series(build, parallel(watchFiles, server));
+const watchTask = series(build, parallel(watchFiles, server));
 
 // =============================================================================
 exports.cleanDist = cleanDist;
