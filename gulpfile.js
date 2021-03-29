@@ -16,6 +16,7 @@ const { src, dest, parallel } = require('gulp'),
 	webpcss = require('gulp-webpcss'),
 	ttf2woff = require('gulp-ttf2woff'),
 	ttf2woff2 = require('gulp-ttf2woff2'),
+	sourcemaps = require('gulp-sourcemaps'),
 	fs = require('fs');
 
 // ===========================================================================
@@ -74,6 +75,7 @@ function html() {
 
 function styles() {
 	return src(path.src.css)
+		.pipe(sourcemaps.init())
 		.pipe(
 			sass({
 				outputStyle: 'expanded',
@@ -81,10 +83,16 @@ function styles() {
 		)
 		.pipe(groupMedia())
 		.pipe(autoprefixer())
-		.pipe(webpcss())
+		.pipe(
+			webpcss({
+				webpClass: '',
+				noWebpClass: '.no-webp',
+			})
+		)
 		.pipe(dest(path.build.css))
 		.pipe(cleanCSS({ compatibility: 'ie8' }))
 		.pipe(rename({ suffix: '.min', prefix: '' }))
+		.pipe(sourcemaps.write('./'))
 		.pipe(dest(path.build.css))
 		.pipe(browserSync.stream());
 }
